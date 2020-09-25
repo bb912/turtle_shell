@@ -69,7 +69,7 @@ void print_help();
 typedef struct
 {
   array_list * history;
-  int byebye;
+  int quit;
   char * cur_dir;
   int * pids;
   int pid_point;
@@ -83,10 +83,10 @@ static char * input_line = (char *)NULL;
 
 // not used, but could be used for a help directory in the future
 char * commands[NUM_COMMANDS][2] = {
-  { "movetodir", "Change to directory DIR" },
+  { "cd", "\tChange to directory DIR" },
   { "whereami", "Print current directory" },
   { "history [-c]", "Display history or clear history if -c" },
-  { "byebye", "\tQuit the shell" },
+  { "quit", "\tQuit the shell" },
   { "start program [params]", "start a program with certain parameters" },
   { "background program [params]",
   "Immediately prints out PID of program and return prompt"},
@@ -116,16 +116,16 @@ int hello()
   printf("____________██░░░░░░██▒▒▒▒▒▒▒▒▒▒▒▒████████▒▒▒▒▒▒▒▒▒▒▒▒██░░██__\n");
   printf("______________████████▒▒████████▒▒▒▒▒▒▒▒▒▒▒▒████████▒▒████____\n");
   printf("______________________████░░░░████████████████░░░░████________\n");
-  printf("__A turtle is it's______██░░░░██____________██░░░░██__________\n");
-  printf("_________Shell__________██░░░░██____________██░░░░██__________\n");
-  printf("________________________██▓▓░░██____________██▓▓░░██__________\n");
+  printf("__A turtle is it's______██░░░░██____________██░░░░██need_help?\n");
+  printf("_________Shell__________██░░░░██____________██░░░░██__type____\n");
+  printf("________________________██▓▓░░██____________██▓▓░░██____help__\n");
   printf("________________________████████____________████████__________\n");
   return 1;
 }
 
 
 // main function loop.
-// while we haven't seen 'byebye' continue looping
+// while we haven't seen 'quit' continue looping
 int main(argc, argv) int argc; char **argv;
 {
   hello();
@@ -136,7 +136,7 @@ int main(argc, argv) int argc; char **argv;
 
   // I/O loop.
   // Fill input_line pointer with user input, tokenize it, run commands with it.
-  while(!global.byebye)
+  while(!global.quit)
   {
     // check if input line exists, if so, free it and set to null.
     if (input_line)
@@ -183,7 +183,7 @@ void init_globals()
   getcwd(buff, FILE_MAX);
   global.history = makeArrayList(20);
   global.cur_dir = buff;
-  global.byebye = 0;
+  global.quit = 0;
   global.pids = (int *) calloc(1, sizeof(int)*100);
   global.pid_point = 0;
   int i;
@@ -236,11 +236,11 @@ int exec_tokens(char ** tokens)
     {
       print_help();
     }
-    else if (strcmp(tokens[i], "byebye") == 0)
+    else if (strcmp(tokens[i], "quit") == 0)
     {
-      global.byebye = 1;
+      global.quit = 1;
     }
-    else if (strcmp(tokens[i], "movetodir") == 0)
+    else if (strcmp(tokens[i], "cd") == 0)
     {
        i += 1;
        if (tokens[i] == NULL)
@@ -372,7 +372,7 @@ void where_am_i()
 }
 
 
-// movetodir command
+// cd command
 int move_to_dir(char * directory)
 {
   if (chdir(directory) != 0)
